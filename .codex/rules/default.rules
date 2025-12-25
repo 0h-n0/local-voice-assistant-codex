@@ -16,3 +16,4 @@ prefix_rule(pattern=["/bin/bash", "-lc", "gh pr create --base main --head 001-ll
 prefix_rule(pattern=["git", "pull", "--ff-only"], decision="allow")
 prefix_rule(pattern=["git", "push", "-u", "origin", "codex-artifacts"], decision="allow")
 prefix_rule(pattern=["/bin/bash", "-lc", "gh pr create --base main --head codex-artifacts --title \"chore: add codex config artifacts\" --body \"## Summary\n- add Codex CLI config, history, rules, and skills artifacts\n\n## Testing\n- not run (configuration files only)\""], decision="allow")
+prefix_rule(pattern=["git", "push"], decision="allow")
