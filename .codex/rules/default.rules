@@ -14,3 +14,5 @@ prefix_rule(pattern=["uv", "run", "--with", "pytest", "pytest"], decision="allow
 prefix_rule(pattern=["git", "push", "-u", "origin", "001-llm-service"], decision="allow")
 prefix_rule(pattern=["/bin/bash", "-lc", "gh pr create --base main --head 001-llm-service --title \"feat: add llm service and fix stt errors\" --body \"## Summary\n- add LLM service spec/plan/contracts/quickstart\n- implement LLM completion endpoint and client wrapper\n- add LLM tests and structured validation errors\n- fix STT error handling and form parsing; add multipart dependency\n\n## Testing\n- uv run --with ruff ruff check .\n- uv run --with pytest pytest\""], decision="allow")
 prefix_rule(pattern=["git", "pull", "--ff-only"], decision="allow")
+prefix_rule(pattern=["git", "push", "-u", "origin", "codex-artifacts"], decision="allow")
+prefix_rule(pattern=["/bin/bash", "-lc", "gh pr create --base main --head codex-artifacts --title \"chore: add codex config artifacts\" --body \"## Summary\n- add Codex CLI config, history, rules, and skills artifacts\n\n## Testing\n- not run (configuration files only)\""], decision="allow")
