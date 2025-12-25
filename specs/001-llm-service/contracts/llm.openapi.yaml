@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: LLM Service API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /llm/complete:
+    post:
+      summary: Generate completion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LlmRequest"
+      responses:
+        "200":
+          description: Completion response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LlmResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Provider error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+    LlmRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+          maxLength: 4000
+    LlmResponse:
+      type: object
+      required: [request_id, text]
+      properties:
+        request_id:
+          type: string
+        text:
+          type: string
+        model:
+          type: string
+          example: gpt-5-mini
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
