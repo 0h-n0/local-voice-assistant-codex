@@ -26,3 +26,13 @@ send `{ "event": "end" }` to finalize.
 ```bash
 curl http://localhost:8000/health
 ```
+
+## LLM Service (WIP)
+
+### Prompt completion
+
+```bash
+curl -X POST http://localhost:8000/llm/complete \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "こんにちは"}'
+```
