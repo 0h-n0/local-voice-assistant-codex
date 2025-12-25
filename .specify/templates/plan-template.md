@@ -31,7 +31,14 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Local-first privacy honored (no network or telemetry without explicit approval)
+- [ ] Scriptable interfaces with stable input/output contracts
+- [ ] Critical-path tests planned for routing, parsing, persistence, or device control
+- [ ] Observability plan includes structured logs and opt-in diagnostics
+- [ ] Versioning and migration impact documented for any contract changes
+- [ ] Tooling compliance: uv for Python dependencies, Ruff linting, Pydantic validation
+- [ ] Stack compliance: React/Next (TypeScript) frontend and FastAPI backend
+- [ ] Workflow compliance: branch before work, README updated, PR ready for review
 
 ## Project Structure
 

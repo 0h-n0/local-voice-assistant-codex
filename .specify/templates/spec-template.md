@@ -95,6 +95,14 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Technical Constraints *(mandatory)*
+
+- **TC-001**: Frontend MUST use React/Next with TypeScript.
+- **TC-002**: Backend MUST use FastAPI.
+- **TC-003**: Python dependency management MUST use uv.
+- **TC-004**: Data validation MUST use Pydantic schemas.
+- **TC-005**: Linting MUST be enforced with Ruff.
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
