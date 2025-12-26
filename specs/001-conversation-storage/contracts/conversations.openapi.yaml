@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Conversation History API
+  version: 1.0.0
+paths:
+  /conversations:
+    get:
+      summary: List conversation summaries
+      responses:
+        "200":
+          description: Conversation summaries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationListResponse"
+  /conversations/{conversation_id}:
+    get:
+      summary: Get conversation by ID
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationDetailResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete conversation by ID
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /conversations/{conversation_id}/messages:
+    post:
+      summary: Append messages to a conversation
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppendMessagesRequest"
+      responses:
+        "200":
+          description: Conversation updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationDetailResponse"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    ConversationSummary:
+      type: object
+      required:
+        - id
+        - updated_at
+      properties:
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - created_at
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ConversationListResponse:
+      type: object
+      required:
+        - conversations
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationSummary"
+    ConversationDetailResponse:
+      type: object
+      required:
+        - id
+        - messages
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+    AppendMessagesRequest:
+      type: object
+      required:
+        - messages
+      properties:
+        messages:
+          type: array
+          items:
+            type: object
+            required:
+              - role
+              - content
+            properties:
+              role:
+                type: string
+                enum: [user, assistant, system]
+              content:
+                type: string
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
