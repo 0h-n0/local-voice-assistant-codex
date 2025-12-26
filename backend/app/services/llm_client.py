@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from openai import OpenAI
 
-from app.config import LLM_CONFIG
+from app.config import LLM_CONFIG, SETTINGS
 
 
 @dataclass(frozen=True)
@@ -21,7 +21,7 @@ class LlmProviderError(RuntimeError):
 
 class LlmClient:
     def __init__(self, api_key: str | None = None) -> None:
-        self._api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self._api_key = api_key or SETTINGS.openai_api_key or os.getenv("OPENAI_API_KEY")
         if not self._api_key:
             raise LlmProviderError("missing_api_key", "Missing OpenAI API key")
         self._client = OpenAI(api_key=self._api_key)

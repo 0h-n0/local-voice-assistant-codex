@@ -81,6 +81,26 @@ npm run dev
 
 Open `http://localhost:3000` and use the recording controls to chat by voice.
 
+## Configuration
+
+Configuration values can be supplied via environment variables, `.env`, or a single
+TOML config file, with precedence: environment > .env > config file. Sensitive values
+such as API keys are redacted in summaries.
+
+Example `.env`:
+
+```env
+OPENAI_API_KEY=your-key
+LLM_MODEL=gpt-5-mini
+```
+
+Example `config.toml`:
+
+```toml
+[llm]
+model="gpt-5-mini"
+```
+
 ## Realtime WebSocket (WIP)
 
 Connect to `ws://localhost:8000/ws/voice` and stream WAV chunks (100–200ms). The
