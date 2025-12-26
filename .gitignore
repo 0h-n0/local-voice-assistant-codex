@@ -12,6 +12,7 @@ dist/
 build/
 *.log
 .env*
+config.toml
 
 # Universal
 .DS_Store

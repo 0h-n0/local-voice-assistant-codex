@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Config Summary API
+  version: 1.0.0
+paths:
+  /config:
+    get:
+      summary: Get redacted configuration summary
+      operationId: getConfigSummary
+      responses:
+        "200":
+          description: Redacted configuration summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigSummary"
+components:
+  schemas:
+    ConfigSummary:
+      type: object
+      required:
+        - settings
+        - validated_at
+        - version
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConfigSetting"
+        validated_at:
+          type: string
+          format: date-time
+        version:
+          type: string
+    ConfigSetting:
+      type: object
+      required:
+        - key
+        - value
+        - source
+        - sensitive
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+          description: Redacted value when sensitive is true.
+        source:
+          type: string
+          enum: [env, dotenv, config_file, default]
+        sensitive:
+          type: boolean
+        description:
+          type: string

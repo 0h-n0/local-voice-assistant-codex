@@ -1,0 +1,22 @@
+[llm]
+api_key=""
+model="gpt-5-mini"
+max_prompt_length=4000
+
+[stt]
+model_path=""
+max_duration_seconds=60
+supported_formats=["wav", "flac", "mp3"]
+
+[tts]
+model_path=""
+max_text_length=1000
+default_voice="default"
+audio_format="wav"
+
+[audio]
+input_device=""
+output_device=""
+
+[storage]
+database_path="data/conversations.db"
