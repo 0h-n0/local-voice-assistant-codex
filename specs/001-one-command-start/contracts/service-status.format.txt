@@ -1,0 +1,9 @@
+Service Status Output (CLI)
+
+- Each line: <service>\t<state>\t<message>
+- state: running | stopped | failed
+- message: optional human-readable detail
+
+Example:
+backend\trunning\tlistening on :8000
+frontend\trunning\tlistening on :3000

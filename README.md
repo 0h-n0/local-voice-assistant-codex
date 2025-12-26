@@ -81,6 +81,28 @@ npm run dev
 
 Open `http://localhost:3000` and use the recording controls to chat by voice.
 
+## One-Command Startup
+
+Default services: backend + frontend.
+
+Start all services:
+
+```sh
+make start
+```
+
+Check status:
+
+```sh
+make status
+```
+
+Stop all services:
+
+```sh
+make stop
+```
+
 ## Configuration
 
 Configuration values can be supplied via environment variables, `.env`, or a single
