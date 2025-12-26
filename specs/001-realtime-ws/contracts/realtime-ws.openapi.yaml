@@ -1,0 +1,27 @@
+openapi: 3.0.3
+info:
+  title: Realtime Voice WebSocket
+  version: 1.0.0
+paths:
+  /ws/voice:
+    get:
+      summary: WebSocket endpoint for realtime voice streaming
+      responses:
+        "101":
+          description: Switching Protocols
+components:
+  schemas:
+    StreamEvent:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum: [status, transcript, response, audio]
+        payload:
+          type: object
+        timestamp:
+          type: string
+          format: date-time

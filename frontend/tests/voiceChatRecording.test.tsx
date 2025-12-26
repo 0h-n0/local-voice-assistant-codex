@@ -11,10 +11,17 @@ vi.mock("../app/services/audioRecorder", () => ({
   },
 }));
 
-vi.mock("../app/services/chatApi", () => ({
-  transcribeAudio: vi.fn().mockResolvedValue("Hello"),
-  requestAssistantReply: vi.fn().mockResolvedValue("Hi there"),
-  synthesizeSpeech: vi.fn().mockResolvedValue(new Blob()),
+const callbacks: { onEvent?: (event: any) => void } = {};
+
+vi.mock("../app/services/realtimeClient", () => ({
+  RealtimeClient: class {
+    connect = (cbs: any) => {
+      callbacks.onEvent = cbs.onEvent;
+    };
+    sendAudio = vi.fn();
+    sendEnd = vi.fn();
+    disconnect = vi.fn();
+  },
 }));
 
 describe("voice recording flow", () => {
