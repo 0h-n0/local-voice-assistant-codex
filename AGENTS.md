@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-26
 - N/A (no persistence required) (001-stt-api)
 - Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, OpenAI API client (001-llm-service)
 - N/A (no persistence) (001-llm-service)
+- Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, Style-Bert-VITS2 (001-tts-api)
+- N/A (no persistence) (001-tts-api)
 
 - Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, Next.js, React (001-project-scaffold)
 
@@ -27,6 +29,7 @@ Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x: Follow standar
 
 ## Recent Changes
 - 001-llm-service: Added Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, OpenAI API client
+- 001-tts-api: Added Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, Style-Bert-VITS2
 - 001-stt-api: Added Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, reazon-research/reazonspeech-nemo-v2
 
 - 001-project-scaffold: Added Python 3.11 (backend), Node.js 20 LTS (frontend), TypeScript 5.x + FastAPI, Pydantic, Uvicorn, uv, Ruff, Next.js, React

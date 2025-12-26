@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: TTS API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /tts/synthesize:
+    post:
+      summary: Synthesize speech
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TtsRequest"
+      responses:
+        "200":
+          description: Synthesis response
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Synthesis failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+    TtsRequest:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          maxLength: 1000
+        voice:
+          type: string
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
