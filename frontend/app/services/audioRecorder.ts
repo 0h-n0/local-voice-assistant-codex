@@ -3,12 +3,13 @@ type RecorderState = {
   context: AudioContext;
   processor: ScriptProcessorNode;
   chunks: Float32Array[];
+  onChunk?: (chunk: Blob) => void;
 };
 
 export class AudioRecorder {
   private state: RecorderState | null = null;
 
-  async start(): Promise<void> {
+  async start(onChunk?: (chunk: Blob) => void): Promise<void> {
     if (this.state) {
       return;
     }
@@ -21,12 +22,16 @@ export class AudioRecorder {
     processor.onaudioprocess = (event) => {
       const input = event.inputBuffer.getChannelData(0);
       chunks.push(new Float32Array(input));
+      if (onChunk) {
+        const wavBuffer = encodeWav(new Float32Array(input), context.sampleRate);
+        onChunk(new Blob([wavBuffer], { type: "audio/wav" }));
+      }
     };
 
     source.connect(processor);
     processor.connect(context.destination);
 
-    this.state = { stream, context, processor, chunks };
+    this.state = { stream, context, processor, chunks, onChunk };
   }
 
   async stop(): Promise<Blob> {

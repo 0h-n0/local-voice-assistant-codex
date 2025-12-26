@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ChatMessage } from "./components/ChatMessage";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -8,20 +8,105 @@ import { PlaybackControls } from "./components/PlaybackControls";
 import { RecordingIndicator } from "./components/RecordingIndicator";
 import { playAudio } from "./services/audioPlayer";
 import { AudioRecorder } from "./services/audioRecorder";
-import { requestAssistantReply, synthesizeSpeech, transcribeAudio } from "./services/chatApi";
+import { RealtimeClient } from "./services/realtimeClient";
 import type { ChatMessage as ChatMessageType } from "./services/chatTypes";
+import type { StreamEvent, StreamStatus } from "./services/realtimeTypes";
 
 export function VoiceChatPage() {
   const recorderRef = useRef(new AudioRecorder());
+  const audioChunksRef = useRef<Blob[]>([]);
+  const lastAssistantIdRef = useRef<string | null>(null);
+  const clientRef = useRef<RealtimeClient | null>(null);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [status, setStatus] = useState<StreamStatus>("idle");
+  const [partialTranscript, setPartialTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const isBusy = status !== "idle" && !isRecording;
+
+  const wsUrl = useMemo(
+    () => process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/voice",
+    []
+  );
+  const wsToken = useMemo(() => process.env.NEXT_PUBLIC_WS_TOKEN, []);
+
+  const attachAudioToLastAssistant = (audio: Blob) => {
+    const targetId = lastAssistantIdRef.current;
+    if (!targetId) {
+      audioChunksRef.current.push(audio);
+      return;
+    }
+    setMessages((prev) =>
+      prev.map((message) =>
+        message.id === targetId ? { ...message, audio } : message
+      )
+    );
+    lastAssistantIdRef.current = null;
+  };
+
+  const handleEvent = (event: StreamEvent) => {
+    if (event.type === "status") {
+      setStatus(event.payload.state);
+      if (event.payload.state === "error") {
+        setError(event.payload.message ?? "Streaming error.");
+      }
+      return;
+    }
+
+    if (event.type === "transcript") {
+      if (event.payload.is_final) {
+        const finalMessage: ChatMessageType = {
+          id: `user-${Date.now()}`,
+          role: "user",
+          content: event.payload.text,
+        };
+        setMessages((prev) => [...prev, finalMessage]);
+        setPartialTranscript("");
+      } else {
+        setPartialTranscript(event.payload.text);
+      }
+      return;
+    }
+
+    if (event.type === "response") {
+      const assistantMessage: ChatMessageType = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: event.payload.text,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      lastAssistantIdRef.current = assistantMessage.id;
+      if (audioChunksRef.current.length) {
+        const audio = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        audioChunksRef.current = [];
+        attachAudioToLastAssistant(audio);
+      }
+      return;
+    }
+  };
+
+  const handleAudio = (audio: Blob) => {
+    attachAudioToLastAssistant(audio);
+  };
+
+  const connectClient = () => {
+    if (clientRef.current) {
+      return;
+    }
+    const client = new RealtimeClient(wsUrl, wsToken);
+    client.connect({
+      onEvent: handleEvent,
+      onAudio: handleAudio,
+      onClose: () => setStatus("idle"),
+    });
+    clientRef.current = client;
+  };
 
   const handleStart = async () => {
     setError(null);
     try {
-      await recorderRef.current.start();
+      connectClient();
+      await recorderRef.current.start((chunk) => clientRef.current?.sendAudio(chunk));
       setIsRecording(true);
     } catch (err) {
       setError("Failed to start recording.");
@@ -30,30 +115,11 @@ export function VoiceChatPage() {
 
   const handleStop = async () => {
     setIsRecording(false);
-    setIsProcessing(true);
     try {
-      const audio = await recorderRef.current.stop();
-      const transcript = await transcribeAudio(audio);
-      const userMessage: ChatMessageType = {
-        id: `user-${Date.now()}`,
-        role: "user",
-        content: transcript,
-      };
-      setMessages((prev) => [...prev, userMessage]);
-
-      const assistantText = await requestAssistantReply(transcript);
-      const assistantAudio = await synthesizeSpeech(assistantText);
-      const assistantMessage: ChatMessageType = {
-        id: `assistant-${Date.now()}`,
-        role: "assistant",
-        content: assistantText,
-        audio: assistantAudio,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      await recorderRef.current.stop();
+      clientRef.current?.sendEnd();
     } catch (err) {
       setError("Recording or playback failed. Please retry.");
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -79,11 +145,16 @@ export function VoiceChatPage() {
 
       <section style={{ marginTop: "1.5rem" }}>
         <RecordingIndicator active={isRecording} />
+        {status !== "idle" ? (
+          <div style={{ marginTop: "0.5rem", color: "#475569" }}>
+            Status: {status}
+          </div>
+        ) : null}
         <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
           <button
             type="button"
             onClick={isRecording ? handleStop : handleStart}
-            disabled={isProcessing}
+            disabled={isBusy}
             style={{
               padding: "0.75rem 1.5rem",
               borderRadius: "999px",
@@ -96,12 +167,14 @@ export function VoiceChatPage() {
           >
             {isRecording ? "Stop Recording" : "Start Recording"}
           </button>
-          {isProcessing ? (
-            <span style={{ color: "#0f172a" }}>Processing...</span>
-          ) : null}
         </div>
         {error ? (
           <div style={{ marginTop: "0.5rem", color: "#b91c1c" }}>{error}</div>
+        ) : null}
+        {partialTranscript ? (
+          <div style={{ marginTop: "0.5rem", color: "#0f172a" }}>
+            Live transcript: {partialTranscript}
+          </div>
         ) : null}
       </section>
 

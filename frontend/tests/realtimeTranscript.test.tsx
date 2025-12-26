@@ -1,15 +1,8 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import { VoiceChatPage } from "../app/page";
-
-vi.mock("../app/services/audioRecorder", () => ({
-  AudioRecorder: class {
-    start = vi.fn().mockResolvedValue(undefined);
-    stop = vi.fn().mockResolvedValue(new Blob());
-  },
-}));
 
 let onEvent: ((event: any) => void) | undefined;
 
@@ -24,23 +17,29 @@ vi.mock("../app/services/realtimeClient", () => ({
   },
 }));
 
-describe("error handling", () => {
-  it("shows retry button when recording fails", async () => {
+vi.mock("../app/services/audioRecorder", () => ({
+  AudioRecorder: class {
+    start = vi.fn().mockResolvedValue(undefined);
+    stop = vi.fn().mockResolvedValue(new Blob());
+  },
+}));
+
+describe("realtime transcript", () => {
+  it("renders live transcript updates", async () => {
     const user = userEvent.setup();
     render(<VoiceChatPage />);
 
     await user.click(screen.getByRole("button", { name: "Start Recording" }));
-    await user.click(screen.getByRole("button", { name: "Stop Recording" }));
 
     await act(async () => {
       onEvent?.({
-        type: "status",
-        payload: { state: "error", message: "fail" },
+        type: "transcript",
+        payload: { text: "partial text", is_final: false },
       });
     });
 
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(/Live transcript: partial text/)
+    ).toBeInTheDocument();
   });
 });

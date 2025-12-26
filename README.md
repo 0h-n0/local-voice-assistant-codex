@@ -80,3 +80,8 @@ npm run dev
 ```
 
 Open `http://localhost:3000` and use the recording controls to chat by voice.
+
+## Realtime WebSocket (WIP)
+
+Connect to `ws://localhost:8000/ws/voice` and stream WAV chunks (100–200ms). The
+server emits `status`, `transcript`, `response`, and `audio` events.

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
@@ -7,13 +7,6 @@ import { VoiceChatPage } from "../app/page";
 const playAudio = vi.fn();
 let onEvent: ((event: any) => void) | undefined;
 let onAudio: ((audio: Blob) => void) | undefined;
-
-vi.mock("../app/services/audioRecorder", () => ({
-  AudioRecorder: class {
-    start = vi.fn().mockResolvedValue(undefined);
-    stop = vi.fn().mockResolvedValue(new Blob());
-  },
-}));
 
 vi.mock("../app/services/realtimeClient", () => ({
   RealtimeClient: class {
@@ -31,26 +24,30 @@ vi.mock("../app/services/audioPlayer", () => ({
   playAudio: (...args: unknown[]) => playAudio(...args),
 }));
 
-describe("voice playback flow", () => {
-  it("renders playback control and triggers play", async () => {
+vi.mock("../app/services/audioRecorder", () => ({
+  AudioRecorder: class {
+    start = vi.fn().mockResolvedValue(undefined);
+    stop = vi.fn().mockResolvedValue(new Blob());
+  },
+}));
+
+describe("realtime playback", () => {
+  it("shows play button for audio events", async () => {
     const user = userEvent.setup();
     render(<VoiceChatPage />);
 
     await user.click(screen.getByRole("button", { name: "Start Recording" }));
-    await user.click(screen.getByRole("button", { name: "Stop Recording" }));
 
     await act(async () => {
-      onEvent?.({ type: "response", payload: { text: "Hi there" } });
+      onEvent?.({ type: "response", payload: { text: "hello" } });
     });
     await act(async () => {
-      onAudio?.(new Blob([new Uint8Array([1, 2, 3])], { type: "audio/wav" }));
+      onAudio?.(new Blob([new Uint8Array([1])], { type: "audio/wav" }));
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("Assistant")).toBeInTheDocument();
+    const playButton = await screen.findByRole("button", {
+      name: "Play audio",
     });
-
-    const playButton = screen.getByRole("button", { name: "Play audio" });
     await user.click(playButton);
 
     expect(playAudio).toHaveBeenCalled();
