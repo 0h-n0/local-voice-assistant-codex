@@ -36,3 +36,11 @@ curl -X POST http://localhost:8000/llm/complete \
   -H "Content-Type: application/json" \
   -d '{"prompt": "こんにちは"}'
 ```
+
+## TTS API (WIP)
+
+```bash
+curl -X POST http://localhost:8000/tts/synthesize \
+  -H "Content-Type: application/json" \
+  -d '{"text": "こんにちは", "voice": "default"}' --output output.wav
+```

@@ -26,7 +26,8 @@ async def transcribe_file(
             return JSONResponse(
                 status_code=400,
                 content=ErrorResponse(
-                    code="unsupported_audio_format", message="Unsupported audio format"
+                    code="unsupported_audio_format",
+                    message="Unsupported audio format",
                 ).model_dump(),
             )
         return JSONResponse(

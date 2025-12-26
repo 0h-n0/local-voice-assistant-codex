@@ -11,5 +11,12 @@ class LlmConfig(BaseModel):
     max_prompt_length: int = 4000
 
 
+class TtsConfig(BaseModel):
+    max_text_length: int = 1000
+    default_voice: str = "default"
+    audio_format: str = "wav"
+
+
 DEFAULT_CONFIG = SttConfig()
 LLM_CONFIG = LlmConfig()
+TTS_CONFIG = TtsConfig()
