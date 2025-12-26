@@ -70,3 +70,13 @@ curl "http://localhost:8000/conversations"
 ```bash
 curl -X DELETE "http://localhost:8000/conversations/conv-001"
 ```
+
+## Voice Chat Web UI (WIP)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` and use the recording controls to chat by voice.

@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: Voice Chat UI API
+  version: 1.0.0
+paths:
+  /orchestrate:
+    post:
+      summary: Submit audio for STT → LLM → TTS
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Synthesized audio response
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+  /conversations/{conversation_id}:
+    get:
+      summary: Get conversation history
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationDetailResponse"
+components:
+  schemas:
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - created_at
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ConversationDetailResponse:
+      type: object
+      required:
+        - id
+        - messages
+      properties:
+        id:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
