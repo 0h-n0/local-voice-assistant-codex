@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: Voice Orchestrator API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /orchestrate:
+    post:
+      summary: Run STT → LLM → TTS
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Synthesized audio response
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageError"
+        "502":
+          description: Upstream stage error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageError"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+    StageError:
+      type: object
+      required: [stage, code, message]
+      properties:
+        stage:
+          type: string
+          enum: [stt, llm, tts]
+        code:
+          type: string
+        message:
+          type: string
