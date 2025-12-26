@@ -44,3 +44,9 @@ curl -X POST http://localhost:8000/tts/synthesize \
   -H "Content-Type: application/json" \
   -d '{"text": "こんにちは", "voice": "default"}' --output output.wav
 ```
+
+## Orchestrator (WIP)
+
+```bash
+curl -F "file=@sample.wav" http://localhost:8000/orchestrate --output response.wav
+```
