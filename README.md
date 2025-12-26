@@ -50,3 +50,23 @@ curl -X POST http://localhost:8000/tts/synthesize \
 ```bash
 curl -F "file=@sample.wav" http://localhost:8000/orchestrate --output response.wav
 ```
+
+## Conversation History API (WIP)
+
+```bash
+curl -X POST "http://localhost:8000/conversations/conv-001/messages" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hello"},{"role":"assistant","content":"Hi"}]}'
+```
+
+```bash
+curl "http://localhost:8000/conversations/conv-001"
+```
+
+```bash
+curl "http://localhost:8000/conversations"
+```
+
+```bash
+curl -X DELETE "http://localhost:8000/conversations/conv-001"
+```

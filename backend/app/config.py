@@ -17,6 +17,11 @@ class TtsConfig(BaseModel):
     audio_format: str = "wav"
 
 
+class ConversationStorageConfig(BaseModel):
+    database_path: str = "data/conversations.db"
+
+
 DEFAULT_CONFIG = SttConfig()
 LLM_CONFIG = LlmConfig()
 TTS_CONFIG = TtsConfig()
+CONVERSATION_STORAGE_CONFIG = ConversationStorageConfig()
